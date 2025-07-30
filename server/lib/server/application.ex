@@ -10,6 +10,7 @@ defmodule Server.Application do
     children = [
       # Starts a worker by calling: Server.Worker.start_link(arg)
       # {Server.Worker, arg}
+	  {Registry, keys: :unique, name: Server.Registry},
 	  {Bandit, plug: Server.PlugSocket, port: 4000, scheme: :http, }
     ]
 
