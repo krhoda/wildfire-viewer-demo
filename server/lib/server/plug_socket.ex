@@ -30,29 +30,17 @@ defmodule SocketServer do
   end
 
   def handle_in({message, [opcode: :text]}, state) do
-	broadcast_message(message)
-	{:reply, :ok, {:text, message}, state}
+    IO.puts(message)
+    {:ok, state}
   end
 
-  def handle_info({:broadcast, message}, state) do
-	{:reply, :ok, {:text, message}, state} = handle_in({message, [opcode: :text]}, state)
+
+  def handle_info({:send, message}, state) do
 	{:push, {:text, message}, state}
   end
 
   def terminate(:timeout, state) do
-    Registry.unregister(@registry, :all_connections, self())
+    # Registry.unregister(@registry, self())
     {:ok, state}
-  end
-
-  defp broadcast_message(message) do
-	IO.puts("IN BROADCAST")
-	dbg(Registry.lookup(@registry, :all_connections))
-	current_pid = self()
-    for {pid, _} <- Registry.lookup(@registry, :all_connections) do
-	  case pid do
-		^current_pid -> IO.puts("Saw Current PID")
-		_ -> send(pid, {:broadcast, message})
-	  end
-    end
   end
 end
