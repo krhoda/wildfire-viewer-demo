@@ -23,9 +23,10 @@ Or, use `build_and_run.sh`, which will compile the Elixir program and run it usi
 
 Regardless of how it is run, the static UI will be available at [localhost:4000](http://localhost:4000) and will automatically connect to the server's websocket route.
 
-The UI consists of a Leaflet-based map centered on North America and a set of pins generated from the WebSocket fire data. Each pin, when clicked on, will display the name of the incident. 
+The UI consists of a Leaflet-based map centered on North America and a set of pins and (if available) perimeters generated from the WebSocket fire data, if either a pin or perimeter is clicked, it will show the name of the incident.
 
 The actual UI is housed in the `ui` folder, the build command found in `ui`'s `package.json` replaces the contents of the repo's `server/priv/static` with the output of the UI build (along with some vendored images which are used by the map). By combining the WebSocket server with a route to serve the static files that make up the UI, it's a very simple application from a deployment perspective. 
+
 
 This service could easily be packaged in a docker container, or is currently so simple, it could just be built and SCP'd.
 
