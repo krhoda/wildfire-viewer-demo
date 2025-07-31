@@ -3,7 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import type { Incoming } from './types/types'
-import { IncomingContianer } from './components/IncomingContianer'
+import { IncomingContianer } from './components/IncomingContainer'
+import WorldMap from './components/WorldMap'
 
 function App() {
   const [fires, setFires] = useState<Array<Incoming>>([])
@@ -47,9 +48,10 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        {fires.length > 0 ? 
+        {WorldMap(fires)}
+        {/* {fires.length > 0 ? 
           fires.map(fire => IncomingContianer(fire))
-        : <p>No Fire Data</p>}
+        : <p>No Fire Data</p>} */}
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
