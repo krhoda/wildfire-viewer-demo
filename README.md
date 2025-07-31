@@ -42,7 +42,7 @@ There is no wait for a new user to see the latest data, nor does it cause much o
 I wasn't able to find time to write tests, which would have been ideal, but I wanted to make sure I had something workable to show. I would want to particularly test running into timeouts/rate limits/other API errors, testing websocket disconnections and reconnections, the UI's ability to handle malformed data, then looking at coverage reports to add more.
 
 ### Telemetry 
-I skipped telemetry / monitoring for the same reason as testing, I wanted to emphasize features that someone can see, but telemetry would be very important. I would want to record failed requests to the API, websocket disconnections, number of WS connections, and how long it takes to broadcast to call connections to begin with, then consider other metrics to monitor.
+I skipped telemetry / monitoring for the same reason as testing, I wanted to emphasize features that someone can see, but telemetry would be very important. I would want to record failed requests to the API, websocket disconnections, number of WS connections, and how long it takes to broadcast to all connections to begin with, then consider other metrics to monitor.
 
 ### Robust Deployment
 This could easily be packaged in a Dockerfile, but using a `.tool-version` file and a very simple build system seemed like enough for a prototype/demo.
