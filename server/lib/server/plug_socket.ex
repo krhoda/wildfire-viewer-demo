@@ -8,7 +8,6 @@ defmodule Server.PlugSocket do
   plug :dispatch
 
   get "/" do
-    # send_resp(conn, 200, "This is a websocket server, please use the /websocket route to connect")
 	send_file(conn, 200, "priv/static/index.html")
   end
 
@@ -34,14 +33,13 @@ defmodule SocketServer do
 
 	Registry.dispatch(@ingest_registry, :ingest, fn entries ->
 	  for {pid, _} <- entries do
-		send(pid, {:new_connection})
+		send(pid, {:new_connection, self()})
 	  end
 	end)
     {:ok, options}
   end
 
   def handle_in({message, [opcode: :text]}, state) do
-    IO.puts(message)
     {:ok, state}
   end
 

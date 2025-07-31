@@ -16,11 +16,9 @@ defmodule Server.Ingest do
 	{:ok, opts}
   end
 
-  def handle_info({:new_connection}, state) do
+  def handle_info({:new_connection, target_pid}, state) do
 	if Map.has_key?(state, :output) do
-	  Registry.dispatch(@registry, :websockets, fn entries ->
-		for {pid, _} <- entries, do: send(pid, {:send, Map.fetch!(state, :output)})
-	  end)
+	  send(target_pid, {:send, Map.fetch!(state, :output)})
 	else
 	  send(self(), {:make_request})
 	end
@@ -54,11 +52,6 @@ defmodule Server.Ingest do
 	end)
 
 	{:noreply, Map.put(state, :output, output)}
-  end
-
-  def handle_info(_, state) do
-	IO.puts("In generic Handler of Ingest")
-	{:noreply, state}
   end
 
   defp schedule_request() do
