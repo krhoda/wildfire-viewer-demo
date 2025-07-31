@@ -39,7 +39,7 @@ defmodule SocketServer do
     {:ok, options}
   end
 
-  def handle_in({message, [opcode: :text]}, state) do
+  def handle_in({_, [opcode: :text]}, state) do
     {:ok, state}
   end
 

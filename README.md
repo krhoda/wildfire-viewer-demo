@@ -2,7 +2,7 @@
 
 This repository contains everything needed to run a web-service + UI that shows all current fires in the United States.
 
-To run and view this program, from the root of the repository, one can simply:
+To run the program (without building it) and view this UI, from the root of the repository, one can simply:
 ```bash
 $ cd server
 $ mix run --no-halt
@@ -11,8 +11,22 @@ Or, use the `run.sh` file, if prefered. The `.tool-versions` file should enforce
 
 Then, visit `localhost:4000` and the UI will be statically served.
 
+Alternatively, you can use the `build.sh` file, then from `<repo>/server` run:
+```bash
+$ _build/dev/rel/server/bin/server start
+```
+Or, use `build_and_run.sh`, which will compile the Elixir program and run it using the above command.
+
+Regardless of how it is run, the UI will be available at [localhost:4000](http://localhost:4000).
+
 The UI consists of a Leaflet-based map centered on North America and a set of pins generated from the WebSocket fire data. Each pin, when clicked on, will display the name of the incident. 
 
 The actual UI is housed in the `ui` folder, the build command found in `ui`'s `package.json` replaces the contents of the repo's `server/priv/static` with the output of the UI build (along with some vendored images which are used by the map). By combining the WebSocket server with a route to serve the static files that make up the UI, it's a very simple application from a deployment perspective. 
 
 This service could easily be packaged in a docker container, or is currently so simple, it could just be built and SCP'd.
+
+This service makes 1 request a minute to the Wildfire API, the API's docs say it only updates once every 15 minutes, so one could time this less aggressively.
+
+This services uses GenServer state to manage statefulness (rather than postgres). The process described in `server/lib/server/ingest.ex` will keep the last response from the wildfire API in it's state, and when a new connection joins, the new connection is given a copy of the last response. If, for some reason, a user joins and the GenServer does not have a copy of the output, then the GenServer makes a new request to the API and broadcasts the result to all connections.
+
+There is no wait for a new user to see the latest data, nor does it cause much overhead.
