@@ -1,25 +1,25 @@
 export type GeometrySection = {
-  coordinates: [number, number]
-  type: "Point",
-}
+  coordinates: [number, number];
+  type: "Point";
+};
 
 export type PropertiesSection = {
-  name: string,
-}
+  name: string;
+};
 
 export type Incoming = {
-  geometry: GeometrySection,
-  properties: PropertiesSection,
-  type: "Feature",
-}
+  geometry: GeometrySection;
+  properties: PropertiesSection;
+  type: "Feature";
+};
 
 export type Perims = {
-  type: "Feature",
+  type: "Feature";
   properties: {
-    name: string,
-  }
+    name: string;
+  };
   geometry: {
-    type: "Polygon",
-    coordinates: Array<[number, number]>,
-  }
-}
+    type: "Polygon";
+    coordinates: Array<[number, number]>;
+  };
+};
