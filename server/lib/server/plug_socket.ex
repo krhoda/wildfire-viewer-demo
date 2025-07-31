@@ -1,16 +1,15 @@
 defmodule Server.PlugSocket do
   use Plug.Router
 
-  plug Plug.Static, at: "/", from: :server, gzip: false
+  plug(Plug.Static, at: "/", from: :server, gzip: false)
 
-  plug Plug.Logger
-  plug :match
-  plug :dispatch
+  plug(Plug.Logger)
+  plug(:match)
+  plug(:dispatch)
 
   get "/" do
-	send_file(conn, 200, "priv/static/index.html")
+    send_file(conn, 200, "priv/static/index.html")
   end
-
 
   get "/websocket" do
     conn
@@ -29,13 +28,14 @@ defmodule SocketServer do
   @ingest_registry Server.IngestRegistry
 
   def init(options) do
-	Registry.register(@registry, :websockets, self())
+    Registry.register(@registry, :websockets, self())
 
-	Registry.dispatch(@ingest_registry, :ingest, fn entries ->
-	  for {pid, _} <- entries do
-		send(pid, {:new_connection, self()})
-	  end
-	end)
+    Registry.dispatch(@ingest_registry, :ingest, fn entries ->
+      for {pid, _} <- entries do
+        send(pid, {:new_connection, self()})
+      end
+    end)
+
     {:ok, options}
   end
 
@@ -43,9 +43,8 @@ defmodule SocketServer do
     {:ok, state}
   end
 
-
   def handle_info({:send, message}, state) do
-	{:push, {:text, Poison.encode!(message)}, state}
+    {:push, {:text, Poison.encode!(message)}, state}
   end
 
   def terminate(_, state) do

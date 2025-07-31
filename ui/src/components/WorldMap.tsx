@@ -15,10 +15,9 @@ const WorldMap = (incoming: Array<Incoming>, perims: Array<Perims>) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {incoming?.length && incoming.map((fire) => {
-        // TODO: Figure out why I have to flip x/y here.
-        let position = [fire.geometry.coordinates[1], fire.geometry.coordinates[0]];
-        let name = fire.properties.name;
-        let key = `${position[0]}:${position[1]}:${name}}`;
+        const position = [fire.geometry.coordinates[1], fire.geometry.coordinates[0]];
+        const name = fire.properties.name;
+        const key = `${position[0]}:${position[1]}:${name}}`;
         return (
             <Marker position={position} key={key}>
                 <Popup>
@@ -29,11 +28,11 @@ const WorldMap = (incoming: Array<Incoming>, perims: Array<Perims>) => {
       })} 
 
       {perims?.length && perims.map((perim, i) => {
-        let positions = perim.geometry.coordinates.map((x) => {
+        const positions = perim.geometry.coordinates.map((x) => {
             return [x[1], x[0]]
         });
-        let name = perim.properties.name;
-        let key = `${i}-${name}`;
+        const name = perim.properties.name;
+        const key = `${i}-${name}`;
 
         return (
             <Polygon key={key} positions={positions}>

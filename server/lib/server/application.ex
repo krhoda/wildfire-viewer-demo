@@ -10,10 +10,11 @@ defmodule Server.Application do
     children = [
       # Starts a worker by calling: Server.Worker.start_link(arg)
       # {Server.Worker, arg}
-	  {Registry, keys: :duplicate, name: Server.Registry, partitions: System.schedulers_online()},
-	  {Registry, keys: :duplicate, name: Server.IngestRegistry, partitions: System.schedulers_online()},
-	  Server.Ingest,
-	  {Bandit, plug: Server.PlugSocket, port: 4000, scheme: :http, },
+      {Registry, keys: :duplicate, name: Server.Registry, partitions: System.schedulers_online()},
+      {Registry,
+       keys: :duplicate, name: Server.IngestRegistry, partitions: System.schedulers_online()},
+      Server.Ingest,
+      {Bandit, plug: Server.PlugSocket, port: 4000, scheme: :http}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -21,5 +22,4 @@ defmodule Server.Application do
     opts = [strategy: :one_for_one, name: Server.Supervisor]
     Supervisor.start_link(children, opts)
   end
-
 end
