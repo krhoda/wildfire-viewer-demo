@@ -1,11 +1,8 @@
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Polygon, Popup, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css'; // Make sure to import Leaflet's CSS
-import type { Incoming } from '../types/types';
+import type { Incoming, Perims } from '../types/types';
 
-const WorldMap = (incoming: Array<Incoming>) => {
-  // Center of the world (roughly)
-//   const center = [0, 0]; 
-//   const zoom = 2; // Adjust zoom level to see the entire world
+const WorldMap = (incoming: Array<Incoming>, perims: Array<Perims>) => {
 
   return (
     <MapContainer 
@@ -17,7 +14,7 @@ const WorldMap = (incoming: Array<Incoming>) => {
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {incoming.map((fire) => {
+      {incoming?.length && incoming.map((fire) => {
         // TODO: Figure out why I have to flip x/y here.
         let position = [fire.geometry.coordinates[1], fire.geometry.coordinates[0]];
         let name = fire.properties.name;
@@ -30,6 +27,22 @@ const WorldMap = (incoming: Array<Incoming>) => {
             </Marker>
         );
       })} 
+
+      {perims?.length && perims.map((perim, i) => {
+        let positions = perim.geometry.coordinates.map((x) => {
+            return [x[1], x[0]]
+        });
+        let name = perim.properties.name;
+        let key = `${i}-${name}`;
+
+        return (
+            <Polygon key={key} positions={positions}>
+                <Popup>
+                    {name}
+                </Popup>
+            </Polygon>
+        );
+      })}
     </MapContainer>
   );
 };

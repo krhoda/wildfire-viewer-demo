@@ -12,3 +12,14 @@ export type Incoming = {
   properties: PropertiesSection,
   type: "Feature",
 }
+
+export type Perims = {
+  type: "Feature",
+  properties: {
+    name: string,
+  }
+  geometry: {
+    type: "Polygon",
+    coordinates: Array<[number, number]>,
+  }
+}

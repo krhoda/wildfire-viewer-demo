@@ -33,7 +33,9 @@ defmodule Server.Ingest do
 	%HTTPoison.Response{body: body} = HTTPoison.get!(@get_all_incidents_and_perimeters)
 	{:ok, json} = Poison.decode(body)
 
-	output = for n <- List.first(json["layers"])["features"] do
+	[incidentsList, perimeterList] = json["layers"]
+
+	incidents = for n <- incidentsList["features"] do
 	  Map.new([
 		{ :type, "Feature" },
 		{ :geometry, Map.new([
@@ -47,6 +49,26 @@ defmodule Server.Ingest do
 		}
 	  ])
 	end
+
+	perimeters = for n <- perimeterList["features"] do
+	  Map.new([
+		{:type, "Feature"},
+		{ :properties, Map.new([
+			{:name, n["attributes"]["IncidentName"]}
+		  ])
+		},
+		{:geometry, Map.new([
+			{:type, "Polygon"},
+			{:coordinates, Enum.at(n["geometry"]["rings"], 0)}
+		  ])
+		}
+	  ])
+	end
+
+	output = Map.new([
+	  {:incidents, incidents},
+	  {:perimeters, perimeters}
+	])
 
 	Registry.dispatch(@registry, :websockets, fn entries ->
 	  for {pid, _} <- entries, do: send(pid, {:send, output})
