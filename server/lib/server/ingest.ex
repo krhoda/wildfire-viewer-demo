@@ -2,7 +2,7 @@ defmodule Server.Ingest do
   use GenServer
   @registry Server.Registry
   @ingest_registry Server.IngestRegistry
-  @interval 5_000
+  @interval 60_000
   @service_root "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer/"
   @get_all_incidents @service_root <> ~s(query?layerDefs={"0": "1 = 1"}&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&outSR=&datumTransformation=&applyVCSProjection=false&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&returnIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&returnZ=false&returnM=false&sqlFormat=none&f=pjson&token=)
 
@@ -14,11 +14,6 @@ defmodule Server.Ingest do
 	Registry.register(@ingest_registry, :ingest, self())
 	send(self(), {:make_request})
 	{:ok, opts}
-  end
-
-  def handle_info({:send, nil}, state) do
-	IO.puts("In Send Handler of Ingest")
-	{:noreply, state}
   end
 
   def handle_info({:new_connection}, state) do
@@ -59,6 +54,11 @@ defmodule Server.Ingest do
 	end)
 
 	{:noreply, Map.put(state, :output, output)}
+  end
+
+  def handle_info(_, state) do
+	IO.puts("In generic Handler of Ingest")
+	{:noreply, state}
   end
 
   defp schedule_request() do

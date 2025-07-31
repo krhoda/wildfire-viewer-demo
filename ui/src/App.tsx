@@ -1,10 +1,39 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import type { Incoming } from './types/types'
+import { IncomingContianer } from './components/IncomingContianer'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [fires, setFires] = useState<Array<Incoming>>([])
+
+  const ws: React.RefObject<null | WebSocket> = useRef(null);
+
+  useEffect(() => {
+    ws.current = new WebSocket("ws://localhost:4000/websocket")
+    ws.current.onopen = () => console.log("WS Opened!")
+    ws.current.onclose = () => console.log("WS Closed!")
+
+    const {current} = ws;
+
+    return () => {
+      current.close();
+    };
+
+  }, [])
+
+  useEffect(() => {
+    if (!ws?.current) {
+      return;
+    }
+
+    ws.current.onmessage = e => {
+      const message = JSON.parse(e.data);
+      console.log("MESSAGE:", message);
+      setFires(message as Array<Incoming>);
+    }
+  }, [])
 
   return (
     <>
@@ -18,9 +47,9 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        {fires.length > 0 ? 
+          fires.map(fire => IncomingContianer(fire))
+        : <p>No Fire Data</p>}
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
