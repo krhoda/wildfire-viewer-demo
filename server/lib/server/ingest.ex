@@ -4,7 +4,8 @@ defmodule Server.Ingest do
   @ingest_registry Server.IngestRegistry
   @interval 60_000
   @service_root "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer/"
-  @get_all_incidents @service_root <> ~s(query?layerDefs={"0": "1 = 1"}&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&outSR=&datumTransformation=&applyVCSProjection=false&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&returnIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&returnZ=false&returnM=false&sqlFormat=none&f=pjson&token=)
+
+  @get_all_incidents_and_perimeters @service_root <> ~s(query?layerDefs={"0": "1 = 1", "1": "1 = 1"}&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&outSR=&datumTransformation=&applyVCSProjection=false&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&returnIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&returnZ=false&returnM=false&sqlFormat=none&f=pjson&token=)
 
   def start_link(opts) do
 	GenServer.start_link(__MODULE__, %{}, opts)
@@ -29,7 +30,7 @@ defmodule Server.Ingest do
   def handle_info({:make_request}, state) do
 	schedule_request()
 
-	%HTTPoison.Response{body: body} = HTTPoison.get!(@get_all_incidents)
+	%HTTPoison.Response{body: body} = HTTPoison.get!(@get_all_incidents_and_perimeters)
 	{:ok, json} = Poison.decode(body)
 
 	output = for n <- List.first(json["layers"])["features"] do
