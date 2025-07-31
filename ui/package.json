@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && rm -rf ../server/priv/static/* && cp -R dist/* ../server/priv/static && cp -R src/vendor/images/* ../server/priv/static",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -10,7 +10,7 @@ const WorldMap = (incoming: Array<Incoming>) => {
   return (
     <MapContainer 
         //@ts-ignore
-        center={[45,-120]}
+        center={[47,-120]}
         zoom={3}
         style={{ height: '550px', width: '650px' }}
     >

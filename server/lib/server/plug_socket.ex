@@ -1,13 +1,17 @@
 defmodule Server.PlugSocket do
   use Plug.Router
 
+  plug Plug.Static, at: "/", from: :server, gzip: false
+
   plug Plug.Logger
   plug :match
   plug :dispatch
 
   get "/" do
-    send_resp(conn, 200, "This is a websocket server, please use the /websocket route to connect")
+    # send_resp(conn, 200, "This is a websocket server, please use the /websocket route to connect")
+	send_file(conn, 200, "priv/static/index.html")
   end
+
 
   get "/websocket" do
     conn

@@ -13,7 +13,7 @@ defmodule Server.Application do
 	  {Registry, keys: :duplicate, name: Server.Registry, partitions: System.schedulers_online()},
 	  {Registry, keys: :duplicate, name: Server.IngestRegistry, partitions: System.schedulers_online()},
 	  Server.Ingest,
-	  {Bandit, plug: Server.PlugSocket, port: 4000, scheme: :http, }
+	  {Bandit, plug: Server.PlugSocket, port: 4000, scheme: :http, },
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
