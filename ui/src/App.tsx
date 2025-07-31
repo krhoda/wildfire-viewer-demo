@@ -37,16 +37,7 @@ function App() {
       <h1>All Current US Wildfires</h1>
       <div className="card">
         {WorldMap(fires)}
-        {/* {fires.length > 0 ? 
-          fires.map(fire => IncomingContianer(fire))
-        : <p>No Fire Data</p>} */}
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
