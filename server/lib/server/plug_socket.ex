@@ -23,9 +23,16 @@ end
 defmodule SocketServer do
   @behaviour WebSock
   @registry Server.Registry
+  @ingest_registry Server.IngestRegistry
 
   def init(options) do
-	Registry.register(@registry, :all_connections, self())
+	Registry.register(@registry, :websockets, self())
+
+	Registry.dispatch(@ingest_registry, :ingest, fn entries ->
+	  for {pid, _} <- entries do
+		send(pid, {:new_connection})
+	  end
+	end)
     {:ok, options}
   end
 
@@ -36,11 +43,11 @@ defmodule SocketServer do
 
 
   def handle_info({:send, message}, state) do
-	{:push, {:text, message}, state}
+	{:push, {:text, Poison.encode!(message)}, state}
   end
 
-  def terminate(:timeout, state) do
-    # Registry.unregister(@registry, self())
+  def terminate(_, state) do
+    Registry.unregister(@registry, self())
     {:ok, state}
   end
 end

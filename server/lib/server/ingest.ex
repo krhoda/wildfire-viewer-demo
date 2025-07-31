@@ -1,25 +1,64 @@
 defmodule Server.Ingest do
   use GenServer
   @registry Server.Registry
-  @interval 1_000
+  @ingest_registry Server.IngestRegistry
+  @interval 5_000
+  @service_root "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer/"
+  @get_all_incidents @service_root <> ~s(query?layerDefs={"0": "1 = 1"}&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&outSR=&datumTransformation=&applyVCSProjection=false&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&returnIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&returnZ=false&returnM=false&sqlFormat=none&f=pjson&token=)
 
-  def start_link(opts \\ []) do
-	GenServer.start_link(__MODULE__, :ok, opts)
+  def start_link(opts) do
+	GenServer.start_link(__MODULE__, %{}, opts)
   end
 
-  def init(:ok) do
+  def init(opts	\\ %{}) do
+	Registry.register(@ingest_registry, :ingest, self())
 	send(self(), {:make_request})
-	{:ok, %{}}
+	{:ok, opts}
+  end
+
+  def handle_info({:send, nil}, state) do
+	IO.puts("In Send Handler of Ingest")
+	{:noreply, state}
+  end
+
+  def handle_info({:new_connection}, state) do
+	if Map.has_key?(state, :output) do
+	  Registry.dispatch(@registry, :websockets, fn entries ->
+		for {pid, _} <- entries, do: send(pid, {:send, Map.fetch!(state, :output)})
+	  end)
+	else
+	  send(self(), {:make_request})
+	end
+
+	{:noreply, state}
   end
 
   def handle_info({:make_request}, state) do
+	schedule_request()
 
-	Registry.dispatch(@registry, :all_connections, fn entries ->
-	  for {pid, _} <- entries, do: send(pid, {:send, "PLACEHOLDER"})
+	%HTTPoison.Response{body: body} = HTTPoison.get!(@get_all_incidents)
+	{:ok, json} = Poison.decode(body)
+
+	output = for n <- List.first(json["layers"])["features"] do
+	  Map.new([
+		{ :type, "Feature" },
+		{ :geometry, Map.new([
+			{:type, "Point"},
+			{:coordinates, [n["geometry"]["x"], n["geometry"]["y"]]}
+		  ])
+		},
+		{ :properties, Map.new([
+			{:name, n["attributes"]["IncidentName"]}
+		  ])
+		}
+	  ])
+	end
+
+	Registry.dispatch(@registry, :websockets, fn entries ->
+	  for {pid, _} <- entries, do: send(pid, {:send, output})
 	end)
 
-	schedule_request()
-	{:noreply, state}
+	{:noreply, Map.put(state, :output, output)}
   end
 
   defp schedule_request() do

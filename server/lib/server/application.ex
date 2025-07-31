@@ -11,6 +11,7 @@ defmodule Server.Application do
       # Starts a worker by calling: Server.Worker.start_link(arg)
       # {Server.Worker, arg}
 	  {Registry, keys: :duplicate, name: Server.Registry, partitions: System.schedulers_online()},
+	  {Registry, keys: :duplicate, name: Server.IngestRegistry, partitions: System.schedulers_online()},
 	  Server.Ingest,
 	  {Bandit, plug: Server.PlugSocket, port: 4000, scheme: :http, }
     ]
